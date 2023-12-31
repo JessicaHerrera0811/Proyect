@@ -1,0 +1,64 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class PhishingDetector {
+
+    public static void main(String[] args) {
+        // Nombre del archivo a analizar
+        String fileName = "archivo.txt";
+
+        // Términos y sus valores en puntos
+        String[] phishingTerms = {
+                "Microsoft", "PayPal", "Bank of America", "Amazon", "Apple",
+                "Google", "Facebook", "Netflix", "IRS", "Wells Fargo"
+                // Agrega más términos según sea necesario
+        };
+
+        // Puntuación total
+        int totalScore = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            // Mapa para mantener un seguimiento del número de ocurrencias por término
+            java.util.Map<String, Integer> termOccurrences = new java.util.HashMap<>();
+
+            while ((line = br.readLine()) != null) {
+                // Buscar cada término en la línea
+                for (String term : phishingTerms) {
+                    // Se realiza la comparación sin distinción entre mayúsculas y minúsculas
+                    if (line.toLowerCase().contains(term.toLowerCase())) {
+                        // Sumar puntos al total
+                        int points = getPointsForTerm(term);
+                        totalScore += points;
+
+                        // Actualizar el mapa de ocurrencias
+                        termOccurrences.put(term, termOccurrences.getOrDefault(term, 0) + 1);
+
+                        // Imprimir información por cada ocurrencia
+                        System.out.println("Palabra/Frase: " + term + ", Ocurrencias: "
+                                + termOccurrences.get(term) + ", Puntos acumulados: " + totalScore);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Imprimir la puntuación total
+        System.out.println("Puntuación total de phishing: " + totalScore);
+    }
+
+    // Asignar puntos a cada término según la probabilidad
+    private static int getPointsForTerm(String term) {
+        // Aquí puedes ajustar la asignación de puntos según tu criterio
+        // Este es solo un ejemplo simple
+        if (term.length() > 10) {
+            return 3; // Muy probable
+        } else if (term.length() > 5) {
+            return 2; // Algo probable
+        } else {
+            return 1; // Poco probable
+        }
+    }
+}
